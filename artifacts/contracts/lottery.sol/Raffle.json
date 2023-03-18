@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "Raffle",
+  "sourceName": "contracts/lottery.sol",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220af6a65c02b68c95249a9dfc99a8fddc163dc8157e9da58bf6b4873ab3f52a6cd64736f6c63430008120033",
+  "deployedBytecode": "0x6080604052600080fdfea2646970667358221220af6a65c02b68c95249a9dfc99a8fddc163dc8157e9da58bf6b4873ab3f52a6cd64736f6c63430008120033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
