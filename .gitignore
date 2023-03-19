@@ -1,1 +1,5 @@
 node_modules
+
+# Hardhat File
+cache
+artifacts
