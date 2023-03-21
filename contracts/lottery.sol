@@ -18,14 +18,29 @@ contract Raffle is VRFConsumerBaseV2 {
     /* State Variable */
     uint256 private immutable i_entranceFee;
     address payable[] private s_players;
-    VRFCoordinatorV2Interface COORDINATOR;
+    VRFCoordinatorV2Interface private immutable i_vrfCOORDINATOR;
+    bytes32 private immutable i_gasLane;
+    uint64 private immutable i_subscriptionId;
+    uint16 private constant REQUEST_CONFIRMATIONS = 3; // Cap letter and _ is best style practive for constant variables
+    uint32 private immutable i_callbackGasLimit;
+    uint32 private constant NUM_WORDS = 1;
 
     // Events
     event RaffleEnter(address indexed player);
+    event RequestedRaffleWinner(uint256 indexed requestId);
 
-    constructor(address vrfCoordinatorV2, uint256 entranceFee) VRFConsumerBaseV2(vrfCoordinatorV2) {
+    constructor(
+        address vrfCoordinatorV2,
+        uint256 entranceFee,
+        bytes32 gasLane,
+        uint64 subscriptionId,
+        uint32 callbackGasLimit
+    ) VRFConsumerBaseV2(vrfCoordinatorV2) {
         i_entranceFee = entranceFee;
-        COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        i_vrfCOORDINATOR = VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        i_gasLane = gasLane;
+        i_subscriptionId = subscriptionId;
+        i_callbackGasLimit = callbackGasLimit;
     }
 
     function enterRaffle() public payable {
@@ -44,6 +59,15 @@ contract Raffle is VRFConsumerBaseV2 {
         // request a random number
         //nce we get it do something with it
         // 2 transaction process
+
+        uint256 requestId = i_vrfCOORDINATOR.requestRandomWords(
+            i_gasLane, // keyHash
+            i_subscriptionId,
+            REQUEST_CONFIRMATIONS,
+            i_callbackGasLimit,
+            NUM_WORDS
+        );
+        emit RequestedRaffleWinner(requestId);
     }
 
     function fulfillRandomWords(
