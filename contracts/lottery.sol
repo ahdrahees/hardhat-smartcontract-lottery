@@ -11,11 +11,12 @@ pragma solidity 0.8.18;
 
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AutomationCompatibleInterface.sol";
 
 error Raffle__NotEnoughtETHEntered();
 error Raffle__FailedToTransferETH();
 
-contract Raffle is VRFConsumerBaseV2 {
+contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
     /* State Variable */
     uint256 private immutable i_entranceFee;
     address payable[] private s_players;
@@ -60,6 +61,22 @@ contract Raffle is VRFConsumerBaseV2 {
         // name events with the function name reversed
     }
 
+    /**
+     * @dev This is the function that the chainlink keeper/Automation nodes call
+     * They look for the `upkeepNeeded` to return true.
+     * The following should be true in order to return true:
+     * 1. Our time intervel should have passed.
+     * 2. The lottery should have atleast 1 player, and have some ETH.
+     * 3. Our subscription funded with LINK.
+     * 4. The lottery should be in "Open" state.
+     */
+
+    function checkUpkeep(
+        bytes calldata /* checkData */
+    ) external override returns (bool upkeepNeeded, bytes memory /* performData */) {}
+
+    function performUpkeep(bytes calldata performData) external override {}
+
     function requestRandomWinner() external {
         // request a random number
         //nce we get it do something with it
@@ -76,7 +93,7 @@ contract Raffle is VRFConsumerBaseV2 {
     }
 
     function fulfillRandomWords(
-        uint256 /*requestId */,
+        uint256 /* requestId */,
         uint256[] memory randomWords
     ) internal override {
         uint256 indexOfWinner = randomWords[0] % s_players.length;
