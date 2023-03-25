@@ -1,4 +1,4 @@
-// raffle
+// raffle.
 
 // enter the lottery (amount to pay )
 // pick random winner( verifyably random)
