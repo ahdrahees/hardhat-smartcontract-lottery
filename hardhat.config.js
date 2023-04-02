@@ -14,6 +14,8 @@ const GANACHE_RPC_URL = process.env.GANACHE_RPC_URL
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 const GANACHE_PRIVATE_KEY = process.env.GANACHE_PRIVATE_KEY
 
+const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY
+
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
     solidity: "0.8.18",
@@ -59,5 +61,13 @@ module.exports = {
             chainId: 5777,
             blockConfirmations: 6,
         },
+    },
+    gasReporter: {
+        enabled: false,
+        outputFile: "gas-reporter.txt",
+        noColors: true,
+        currency: "USD",
+        coinmarketcap: COINMARKETCAP_API_KEY,
+        token: "ETH",
     },
 }
