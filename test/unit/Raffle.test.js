@@ -66,4 +66,46 @@ const { assert, expect } = require("chai")
                   )
               })
           })
+
+          describe("checkUpkeep", async function () {
+              it("returns false if people haven't send any ETH", async function () {
+                  // we didn't send any ETH or no players
+                  await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
+                  await network.provider.send("evm_mine", [])
+                  const { upkeepNeeded } = await raffle.callStatic.checkUpkeep([])
+
+                  assert(!upkeepNeeded) // assert.equal(upkeepNeeded, false)
+              })
+
+              it("returns false if raffle isn't open", async function () {
+                  await raffle.enterRaffle({ value: raffleEntranceFee })
+
+                  await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
+                  await network.provider.send("evm_mine", [])
+
+                  await raffle.performUpkeep("0x") // "0x" similar to [] in here . it is another way to send blank bytes object
+
+                  const raffleState = await raffle.getRaffleState()
+                  assert.equal(raffleState.toString(), "1")
+
+                  const { upkeepNeeded } = await raffle.callStatic.checkUpkeep([])
+                  assert.equal(upkeepNeeded, false)
+              })
+
+              it("returns false if enough time hasn't passed", async function () {
+                  await raffle.enterRaffle({ value: raffleEntranceFee })
+                  await network.provider.send("evm_increaseTime", [interval.toNumber() - 5])
+                  await network.provider.request({ method: "evm_mine", params: [] })
+                  const { upkeepNeeded } = await raffle.callStatic.checkUpkeep("0x") // "0x" similar to [] in here
+                  assert(!upkeepNeeded)
+              })
+
+              it("returns true if enough time has passed, has players, balance and is open", async function () {
+                  await raffle.enterRaffle({ value: raffleEntranceFee })
+                  await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
+                  await network.provider.send("evm_mine", [])
+                  const { upkeepNeeded } = await raffle.callStatic.checkUpkeep("0x") // "0x" similar to [] in here
+                  assert(upkeepNeeded)
+              })
+          })
       })
