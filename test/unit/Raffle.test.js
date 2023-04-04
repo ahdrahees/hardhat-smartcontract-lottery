@@ -4,7 +4,7 @@ const { assert, expect } = require("chai")
 
 !developmentChains.includes(network.name)
     ? describe.skip
-    : describe("Raffle Unit Test", async function () {
+    : describe("Raffle Unit Test", function () {
           let raffle, vrfCoordinatorV2Mock, raffleEntranceFee, deployer, interval
           const chainId = network.config.chainId
 
@@ -19,7 +19,7 @@ const { assert, expect } = require("chai")
               interval = await raffle.getInterval()
           })
 
-          describe("constructor", async function () {
+          describe("constructor", function () {
               it("initializes the raffle correctly", async function () {
                   // Ideally we make our test has just 1 assert per "it"
                   const raffleState = await raffle.getRaffleState()
@@ -29,7 +29,7 @@ const { assert, expect } = require("chai")
               })
           })
 
-          describe("enterRaffle", async function () {
+          describe("enterRaffle", function () {
               it("reverts when you don't pay enough", async function () {
                   await expect(raffle.enterRaffle()).to.be.revertedWith(
                       "Raffle__NotEnoughtETHEntered"
@@ -67,7 +67,7 @@ const { assert, expect } = require("chai")
               })
           })
 
-          describe("checkUpkeep", async function () {
+          describe("checkUpkeep", function () {
               it("returns false if people haven't send any ETH", async function () {
                   // we didn't send any ETH or no players
                   await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
