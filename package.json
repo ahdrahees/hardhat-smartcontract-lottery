@@ -1,4 +1,7 @@
 {
+  "name": "hardhat-smartcontract-lottery",
+  "author": {"name": "Rahees", "email": "ahdrahees.dev@gmail.com", "url": "https://github.com/ahdrahees/hardhat-smartcontract-lottery"},
+  "version": "1.0.0",
   "devDependencies": {
     "@chainlink/contracts": "^0.6.1",
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
