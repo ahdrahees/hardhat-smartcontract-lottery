@@ -100,16 +100,20 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
     ) public view override returns (bool upkeepNeeded, bytes memory /* performData */) {
         bool isOpen = (RaffleState.OPEN == s_raffleState);
         bool timePassed = ((block.timestamp - s_lastTimeStamp) > i_interval);
-        bool hasPlayers = (s_players.length != 0);
-        bool hasBalance = (address(this).balance != 0);
+        bool hasPlayers = (s_players.length > 0);
+        bool hasBalance = (address(this).balance > 0);
 
         upkeepNeeded = (isOpen && timePassed && hasPlayers && hasBalance);
         // Since upkeepNeeded is declared inside the returns on the function header, therefor upkeepNeeded doesn't need to intialise inthe function body & it will automatically returned.
+        return (upkeepNeeded, "0x0"); // can we comment this out?
 
         // block.timestamp - last block timestamp > interval
     }
 
-    // requestRandomWinner()
+    /**
+     * @dev Once `checkUpkeep` is returning `true`, this function is called
+     * and it kicks off a Chainlink VRF call to get a random winner.
+     */ // requestRandomWinner()
     function performUpkeep(bytes calldata /* performData */) external override {
         // request a random number
         //once we get it do something with it
@@ -133,24 +137,37 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
         emit RequestedRaffleWinner(requestId);
     }
 
+    /**
+     * @dev This is the function that Chainlink VRF node
+     * calls to send the money to the random winner.
+     */
     function fulfillRandomWords(
         uint256 /* requestId */,
         uint256[] memory randomWords
     ) internal override {
+        // s_players size 10
+        // randomNumber 202
+        // 202 % 10 ? what's doesn't divide evenly into 202?
+        // 20 * 10 = 200
+        // 2
+        // 202 % 10 = 2
         uint256 indexOfWinner = randomWords[0] % s_players.length;
         address payable recentWinner = s_players[indexOfWinner];
         s_recentWinner = recentWinner;
         s_players = new address payable[](0); // reset players array
+
+        s_raffleState = RaffleState.OPEN; // RaffleState(0);
+        s_lastTimeStamp = block.timestamp; // Updating last timestamp
+
         (bool success, ) = recentWinner.call{value: address(this).balance}("");
+        // require(success, "Transfer failed");
         if (!success) {
             revert Raffle__FailedToTransferETH();
         }
         emit WinnerPicked(recentWinner);
-        s_lastTimeStamp = block.timestamp; // Updating last timestamp
-        s_raffleState = RaffleState.OPEN; // RaffleState(0);
     }
 
-    /* view / pure functions */
+    /** Getter Functions */
     function getEntranceFee() public view returns (uint256) {
         return i_entranceFee;
     }
