@@ -73,7 +73,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
 
     function enterRaffle() public payable {
         // require(msg.value > i_entranceFee, "Not enough ETH");
-        // error codes are gas efficeint than using require
+        // error codes are gas efficeint than using require()
         if (msg.value < i_entranceFee) {
             revert Raffle__NotEnoughtETHEntered();
         }
@@ -125,7 +125,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
             revert Raffle__UpkeepNotNeeded(
                 address(this).balance,
                 s_players.length,
-                uint256(s_raffleState)
+                uint256(s_raffleState) // casting it back into uint256
             );
         }
         s_raffleState = RaffleState.CALCULATING; // RaffleState(1);
